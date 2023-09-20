@@ -21,3 +21,5 @@ the **osThreadNew** which is the function used to create new tasks takes on 3 ar
 
 When using FreeRTOS we are almost always dealing with preemption and tasks giving CPU Access to each other so using the HAL_delay the blocking function is not permitted.
 Instead we will be using **osDelay** which is non blocking and takes as arguments ticks number. To convert ticks into time we use simple math and the **TICK_RATE_HZ** param.
+
+
