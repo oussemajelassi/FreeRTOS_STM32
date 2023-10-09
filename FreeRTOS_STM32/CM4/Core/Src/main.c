@@ -393,8 +393,13 @@ void vCommunication(void *argument)
 				RTOS_USART_ORDERS_ch [ UART_Counter ] =(char) UART_RecievedData ;
 				UART_Counter ++ ;
 				CommunicationTask_CurrentState = CommunicationTask_LISTENNING ;
-				vTaskDelay( 30 ) ;
+				osThreadSetPriority(CommunicationHandle, osPriorityAboveNormal ) ;
+				vTaskDelay( 1 ) ;
 
+			}
+			else
+			{
+				vTaskDelay( 30 ) ;
 			}
 			break ;
 
@@ -421,6 +426,7 @@ void vCommunication(void *argument)
 			memset(RTOS_USART_ORDERS_ch ,0 , sizeof(RTOS_USART_ORDERS_ch) ) ;
 			UART_Counter = 0 ;
 			CommunicationTask_CurrentState = CommunicationTask_IDLE ;
+			osThreadSetPriority(CommunicationHandle, osPriorityNormal ) ;
 			vTaskDelay(10);
 			break ;
 
