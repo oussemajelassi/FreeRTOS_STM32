@@ -55,3 +55,5 @@ Basically I will but the task reading from heap into sleep, When ever I complete
 
 **xTaskNotify()** and **ulTaskNotifyTake()** are used in my example in order to alert task 2. 
 
+When using ulTaskNotifyTake we can choose to clear or not the notification and that using the first parameter : setting it to either **pdTRUE** or **pdFALSE**.
+
