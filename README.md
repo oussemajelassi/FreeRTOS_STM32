@@ -57,3 +57,12 @@ Basically I will but the task reading from heap into sleep, When ever I complete
 
 When using ulTaskNotifyTake we can choose to clear or not the notification and that using the first parameter : setting it to either **pdTRUE** or **pdFALSE**.
 
+#### Heap Memory corruption Fixed : 
+
+Earlier in the code I was affecting directly the buffer to the Heap_AllocatedMemory like this : 
+``Heap_AllocatedMemory = RTOS_USART_ORDERS_ch ``
+That thing resulted in a corruption since there is no data transfer how ever the pointer **Heap_AllocatedMemory** is now pointing to another adress.
+
+Noting my program was stuck in ``configASSERT( ( pxLink->xBlockSize & xBlockAllocatedBit ) != 0 );`` , meaning that freertos did not confirm that this section is allocated he was right because the pointer pointed some where else.
+I solved the problem by using ``strcpy (Heap_AllocatedMemory , RTOS_USART_ORDERS_ch) ; ``
+
