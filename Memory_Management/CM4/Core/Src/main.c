@@ -95,21 +95,6 @@ int main(void)
 
 	/* USER CODE END 1 */
 
-	/* USER CODE BEGIN Boot_Mode_Sequence_1 */
-	/*HW semaphore Clock enable*/
-	__HAL_RCC_HSEM_CLK_ENABLE();
-	/* Activate HSEM notification for Cortex-M4*/
-	HAL_HSEM_ActivateNotification(__HAL_HSEM_SEMID_TO_MASK(HSEM_ID_0));
-	/*
-  Domain D2 goes to STOP mode (Cortex-M4 in deep-sleep) waiting for Cortex-M7 to
-  perform system initialization (system clock config, external memory configuration.. )
-	 */
-	HAL_PWREx_ClearPendingEvent();
-	HAL_PWREx_EnterSTOPMode(PWR_MAINREGULATOR_ON, PWR_STOPENTRY_WFE, PWR_D2_DOMAIN);
-	/* Clear HSEM flag */
-	__HAL_HSEM_CLEAR_FLAG(__HAL_HSEM_SEMID_TO_MASK(HSEM_ID_0));
-
-	/* USER CODE END Boot_Mode_Sequence_1 */
 	/* MCU Configuration--------------------------------------------------------*/
 
 	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
@@ -254,10 +239,15 @@ static void MX_GPIO_Init(void)
 void vReading(void *argument)
 {
 	/* USER CODE BEGIN 5 */
+	uint32_t Recieved_Notification ;
 	/* Infinite loop */
 	for(;;)
 	{
-		osDelay(1);
+		Recieved_Notification = ulTaskNotifyTake(pdTRUE ,portMAX_DELAY ) ;
+		if ( Recieved_Notification == 1 )
+		{
+			HAL_UART_Transmit(&huart3, "Hello From Task Read\r\n", 22, 200) ;
+		}
 	}
 	/* USER CODE END 5 */
 }
@@ -319,6 +309,7 @@ void vWriting(void *argument)
 
 			strcpy ( Heap_AllocatedMemory , RTOS_USART_ORDERS_ch  ) ;
 
+			xTaskNotify( ReadingTaskHandle , 1 , eSetValueWithOverwrite ) ;
 
 			break ;
 
