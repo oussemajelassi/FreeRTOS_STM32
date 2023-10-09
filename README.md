@@ -46,3 +46,5 @@ As we see Both Stack and Heap are taking more and more memory and going towards 
 Following digikey's Tutorial I will try to implement the two tasks : One reading from UART and writing to heap the other reading from heap and freeing the allocated memory.
 In addition I will not be using Priority manipulating as in First application However I will put **Notifications** into the action.
 
+FreeRTOS Does not enable the use of the Standard Malloc Function However we can check **heap_x.c** Files for the provided and thread safe Functions we can use to access **Heap** Section inside RAM.
+
