@@ -48,3 +48,21 @@ In addition I will not be using Priority manipulating as in First application Ho
 
 FreeRTOS Does not enable the use of the Standard Malloc Function However we can check **heap_x.c** Files for the provided and thread safe Functions we can use to access **Heap** Section inside RAM.
 
+#### Task Notification : 
+
+FreeRTOS enables an inter task communication mecanism called notification.
+Basically I will but the task reading from heap into sleep, When ever I complete recieving the text from user I will wake it up using provided API.
+
+**xTaskNotify()** and **ulTaskNotifyTake()** are used in my example in order to alert task 2. 
+
+When using ulTaskNotifyTake we can choose to clear or not the notification and that using the first parameter : setting it to either **pdTRUE** or **pdFALSE**.
+
+#### Heap Memory corruption Fixed : 
+
+Earlier in the code I was affecting directly the buffer to the Heap_AllocatedMemory like this : 
+``Heap_AllocatedMemory = RTOS_USART_ORDERS_ch ``
+That thing resulted in a corruption since there is no data transfer how ever the pointer **Heap_AllocatedMemory** is now pointing to another adress.
+
+Noting my program was stuck in ``configASSERT( ( pxLink->xBlockSize & xBlockAllocatedBit ) != 0 );`` , meaning that freertos did not confirm that this section is allocated he was right because the pointer pointed some where else.
+I solved the problem by using ``strcpy (Heap_AllocatedMemory , RTOS_USART_ORDERS_ch) ; ``
+
