@@ -35,3 +35,14 @@ The other task which is the main task will obviously be sent to a **Blocked Stat
 I think that there is another good way to implement the listening state inside the communication task which is to make a semaphore and send the main task to a Blocked state until User ends with updating sampling rate.
 I will get back to this when I learn about Semaphores
 
+### Free RTOS : Memory Management : 
+
+When Runnig a C Code, Memory is divided into several  parts noting : **Stack**, **Heap** and **Static**.
+When Creating a Task in FreeRTOS We are allocating more space in the heap.
+
+![autodraw 10_9_2023](https://github.com/oussemajelassi/FreeRTOS_STM32/assets/100140668/df66f011-bbd4-49ef-b51a-1236a406ca32)
+
+As we see Both Stack and Heap are taking more and more memory and going towards each other Especially as every task takes on onther **TCB** and its own stack inside the Heap.
+Following digikey's Tutorial I will try to implement the two tasks : One reading from UART and writing to heap the other reading from heap and freeing the allocated memory.
+In addition I will not be using Priority manipulating as in First application However I will put **Notifications** into the action.
+
