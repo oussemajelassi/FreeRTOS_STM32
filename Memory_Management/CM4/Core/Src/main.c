@@ -251,8 +251,9 @@ void vReading(void *argument)
 		Recieved_Notification = ulTaskNotifyTake(pdTRUE ,portMAX_DELAY ) ;
 		if ( Recieved_Notification == 1 )
 		{
-			HAL_UART_Transmit(&huart3,(uint8_t *) "WEWEwe" , 8 , 200) ;
+			HAL_UART_Transmit(&huart3,(uint8_t *) Heap_AllocatedMemory , strlen(Heap_AllocatedMemory) , 1000) ;
 			vPortFree( Heap_AllocatedMemory ) ;
+			Heap_AllocatedMemory = NULL ;
 
 		}
 	}
@@ -294,7 +295,7 @@ void vWriting(void *argument)
 			break ;
 
 		case WritingTaskLISTENING :
-			UART_MessageRecieved = HAL_UART_Receive(&huart3, &UART_RecievedData , 1 , 100) ;
+			UART_MessageRecieved = HAL_UART_Receive(&huart3, &UART_RecievedData , 1 , 150) ;
 			if ( UART_MessageRecieved == HAL_OK )
 			{
 				if ( UART_RecievedData == '\r')
@@ -315,11 +316,12 @@ void vWriting(void *argument)
 
 		case WritingTaskDONE :
 
-			Heap_AllocatedMemory = (char *) pvPortMalloc ( sizeof ( RTOS_USART_ORDERS_ch ) + 100 ) ;
+			Heap_AllocatedMemory = (char *) pvPortMalloc (  ( UART_Counter + 2 ) * sizeof ( char )  ) ;
 
-			strcpy(Heap_AllocatedMemory , RTOS_USART_ORDERS_ch ) ;
+			strncpy(Heap_AllocatedMemory , RTOS_USART_ORDERS_ch , UART_Counter ) ;
 			xTaskNotify( ReadingTaskHandle , 1 , eSetValueWithOverwrite ) ;
-
+			UART_Counter = 0 ;
+			memset ( RTOS_USART_ORDERS_ch , 0 ,UART_Counter * sizeof(char)) ;
 			WritingTaskCurrentState = WritingTaskIDLE ;
 
 			break ;
