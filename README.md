@@ -72,3 +72,20 @@ I solved the problem by using :
 
 ``strcpy (Heap_AllocatedMemory , RTOS_USART_ORDERS_ch) ; ``
 
+#### Side Task debugging : C pointers : 
+
+While Taking on the "Memory management application I faced something weird after reading The user Input I wanted to allocate dynamic memory and read it from another task after it get notified.
+However For every input I only recieve only the first four chars, After a while of debugging I figured what went wrong :
+``char* Heap_AllocatedMemory ;``
+
+I used this pointer later like this : 
+
+``HAL_UART_TRANSMIT(xxxx , xxxx ,  **sizeof ( Heap_AllocatedMemory )**, xxx ) ; ``
+
+And Yes, Heap_AllocatedMemory is a pointer which size of course 4.
+
+I fixed this by simply using 
+
+``HAL_UART_TRANSMIT(xxxx , xxxx ,  **strlen ( Heap_AllocatedMemory )**, xxx ) ; ``
+
+
