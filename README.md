@@ -121,3 +121,10 @@ They work in a very simple way as they disable interruptions so there will be no
 Instead of disabling all interrupts which is sometimes not possible we can disable the schedular and leave interrupts working so that every context switching demand is kep on hold until the schedular comes back to life again.
 We can achieve this by simply calling  ; 
 ``vTaskSuspendALL() ;`` and then ``vTaskResumeALL();``
+
+#### Mutexes : 
+
+Mutexes are the most known and used in this context they are seen as a token or a trophy that enables a task to use a shared ressource that can be anything like a variable or a peripheral.
+
+This Challenge will be nothing but a circular buffer that gets filled with numbers from "Producer Task" and get read from a "Consumer Task".
+I will try to shape this so I can Practice C++ Programming a little bit and combine twwo powers into one.
