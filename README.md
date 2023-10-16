@@ -105,3 +105,26 @@ I think Queues still have many features for me to discover however for now that 
 
 https://github.com/oussemajelassi/FreeRTOS_STM32/assets/100140668/05745b59-1af5-4ab3-8c5a-8d255e6f57be
 
+### Ressources management : 
+
+#### Basic Critical Sections : 
+
+Critical Sections in FreeRTOS are lines of code in which we wont accept other task taking on the CPU.
+
+To ensure this we need to put these line between two macro-like functions which are : 
+
+``taskENTER_CRITICAL()`` and ``taskEXIT_CRITICAL()``
+They work in a very simple way as they disable interruptions so there will be no way of context switching.
+
+#### Suspending the Scheduler : 
+
+Instead of disabling all interrupts which is sometimes not possible we can disable the schedular and leave interrupts working so that every context switching demand is kep on hold until the schedular comes back to life again.
+We can achieve this by simply calling  ; 
+``vTaskSuspendALL() ;`` and then ``vTaskResumeALL();``
+
+#### Mutexes : 
+
+Mutexes are the most known and used in this context they are seen as a token or a trophy that enables a task to use a shared ressource that can be anything like a variable or a peripheral.
+
+This Challenge will be nothing but a circular buffer that gets filled with numbers from "Producer Task" and get read from a "Consumer Task".
+I will try to shape this so I can Practice C++ Programming a little bit and combine twwo powers into one.
