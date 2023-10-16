@@ -25,6 +25,7 @@
 #include "string.h"
 #include "queue.h"
 #include "stdlib.h"
+#include "Queues_Manipulation.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -57,25 +58,28 @@ UART_HandleTypeDef huart3;
 /* Definitions for CommandingTask */
 osThreadId_t CommandingTaskHandle;
 const osThreadAttr_t CommandingTask_attributes = {
-		.name = "CommandingTask",
-		.stack_size = 128 * 4,
-		.priority = (osPriority_t) osPriorityNormal,
+  .name = "CommandingTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for ExecutingTask */
 osThreadId_t ExecutingTaskHandle;
 const osThreadAttr_t ExecutingTask_attributes = {
-		.name = "ExecutingTask",
-		.stack_size = 128 * 4,
-		.priority = (osPriority_t) osPriorityNormal,
+  .name = "ExecutingTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for CommandQueue */
-QueueHandle_t CommandQueueHandle ;
-
 
 /* Definitions for FeedbackQueue */
-QueueHandle_t FeedbackQueueHandle;
 
 /* USER CODE BEGIN PV */
+
+/* RTOS Queues */
+
+xQueueHandle CommandQueueHandle ;
+
+xQueueHandle FeedbackQueueHandle ;
 
 /* USER CODE END PV */
 
@@ -95,153 +99,160 @@ void vExecuting(void *argument);
 /* USER CODE END 0 */
 
 /**
- * @brief  The application entry point.
- * @retval int
- */
+  * @brief  The application entry point.
+  * @retval int
+  */
 int main(void)
 {
-	/* USER CODE BEGIN 1 */
+  /* USER CODE BEGIN 1 */
 
-	/* USER CODE END 1 */
+  /* USER CODE END 1 */
 
-	/* USER CODE BEGIN Boot_Mode_Sequence_1 */
+/* USER CODE BEGIN Boot_Mode_Sequence_1 */
 
-	/* USER CODE END Boot_Mode_Sequence_1 */
-	/* MCU Configuration--------------------------------------------------------*/
+/* USER CODE END Boot_Mode_Sequence_1 */
+  /* MCU Configuration--------------------------------------------------------*/
 
-	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-	HAL_Init();
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
 
-	/* USER CODE BEGIN Init */
+  /* USER CODE BEGIN Init */
 
-	/* USER CODE END Init */
+  /* USER CODE END Init */
 
-	/* USER CODE BEGIN SysInit */
+  /* USER CODE BEGIN SysInit */
 
-	/* USER CODE END SysInit */
+  /* USER CODE END SysInit */
 
-	/* Initialize all configured peripherals */
-	MX_GPIO_Init();
-	MX_USART3_UART_Init();
-	/* USER CODE BEGIN 2 */
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+  MX_USART3_UART_Init();
+  /* USER CODE BEGIN 2 */
 
-	/* USER CODE END 2 */
+  /* USER CODE END 2 */
 
-	/* Init scheduler */
-	osKernelInitialize();
+  /* Init scheduler */
+  osKernelInitialize();
 
-	/* USER CODE BEGIN RTOS_MUTEX */
+  /* USER CODE BEGIN RTOS_MUTEX */
 	/* add mutexes, ... */
-	/* USER CODE END RTOS_MUTEX */
+  /* USER CODE END RTOS_MUTEX */
 
-	/* USER CODE BEGIN RTOS_SEMAPHORES */
+  /* USER CODE BEGIN RTOS_SEMAPHORES */
 	/* add semaphores, ... */
-	/* USER CODE END RTOS_SEMAPHORES */
+  /* USER CODE END RTOS_SEMAPHORES */
 
-	/* USER CODE BEGIN RTOS_TIMERS */
+  /* USER CODE BEGIN RTOS_TIMERS */
 	/* start timers, add new ones, ... */
-	/* USER CODE END RTOS_TIMERS */
+  /* USER CODE END RTOS_TIMERS */
 
-	/* Create the queue(s) */
-	/* creation of CommandQueue */
+  /* Create the queue(s) */
 
-
-	/* creation of FeedbackQueue */
-	//FeedbackQueueHandle = osMessageQueueNew (10, sizeof(uint32_t), &FeedbackQueue_attributes);
-
-	/* USER CODE BEGIN RTOS_QUEUES */
+  /* USER CODE BEGIN RTOS_QUEUES */
 	/* add queues, ... */
 	CommandQueueHandle = xQueueCreate(10,sizeof(uint32_t)) ;
-	/* USER CODE END RTOS_QUEUES */
+  /* USER CODE END RTOS_QUEUES */
 
-	/* Create the thread(s) */
-	/* creation of CommandingTask */
-	CommandingTaskHandle = osThreadNew(vCommanding, NULL, &CommandingTask_attributes);
+  /* Create the thread(s) */
+  /* creation of CommandingTask */
+  CommandingTaskHandle = osThreadNew(vCommanding, NULL, &CommandingTask_attributes);
 
-	/* creation of ExecutingTask */
-	ExecutingTaskHandle = osThreadNew(vExecuting, NULL, &ExecutingTask_attributes);
+  /* creation of ExecutingTask */
+  ExecutingTaskHandle = osThreadNew(vExecuting, NULL, &ExecutingTask_attributes);
 
-	/* USER CODE BEGIN RTOS_THREADS */
+  /* USER CODE BEGIN RTOS_THREADS */
 	/* add threads, ... */
-	/* USER CODE END RTOS_THREADS */
+  /* USER CODE END RTOS_THREADS */
 
-	/* USER CODE BEGIN RTOS_EVENTS */
+  /* USER CODE BEGIN RTOS_EVENTS */
 	/* add events, ... */
-	/* USER CODE END RTOS_EVENTS */
+  /* USER CODE END RTOS_EVENTS */
 
-	/* Start scheduler */
-	osKernelStart();
+  /* Start scheduler */
+  osKernelStart();
 
-	/* We should never get here as control is now taken by the scheduler */
-	/* Infinite loop */
-	/* USER CODE BEGIN WHILE */
+  /* We should never get here as control is now taken by the scheduler */
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
 	while (1)
 	{
-		/* USER CODE END WHILE */
+    /* USER CODE END WHILE */
 
-		/* USER CODE BEGIN 3 */
+    /* USER CODE BEGIN 3 */
 	}
-	/* USER CODE END 3 */
+  /* USER CODE END 3 */
 }
 
 /**
- * @brief USART3 Initialization Function
- * @param None
- * @retval None
- */
+  * @brief USART3 Initialization Function
+  * @param None
+  * @retval None
+  */
 static void MX_USART3_UART_Init(void)
 {
 
-	/* USER CODE BEGIN USART3_Init 0 */
+  /* USER CODE BEGIN USART3_Init 0 */
 
-	/* USER CODE END USART3_Init 0 */
+  /* USER CODE END USART3_Init 0 */
 
-	/* USER CODE BEGIN USART3_Init 1 */
+  /* USER CODE BEGIN USART3_Init 1 */
 
-	/* USER CODE END USART3_Init 1 */
-	huart3.Instance = USART3;
-	huart3.Init.BaudRate = 115200;
-	huart3.Init.WordLength = UART_WORDLENGTH_8B;
-	huart3.Init.StopBits = UART_STOPBITS_1;
-	huart3.Init.Parity = UART_PARITY_NONE;
-	huart3.Init.Mode = UART_MODE_TX_RX;
-	huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-	huart3.Init.OverSampling = UART_OVERSAMPLING_16;
-	huart3.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-	huart3.Init.ClockPrescaler = UART_PRESCALER_DIV1;
-	huart3.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-	if (HAL_UART_Init(&huart3) != HAL_OK)
-	{
-		Error_Handler();
-	}
-	if (HAL_UARTEx_SetTxFifoThreshold(&huart3, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
-	{
-		Error_Handler();
-	}
-	if (HAL_UARTEx_SetRxFifoThreshold(&huart3, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
-	{
-		Error_Handler();
-	}
-	if (HAL_UARTEx_DisableFifoMode(&huart3) != HAL_OK)
-	{
-		Error_Handler();
-	}
-	/* USER CODE BEGIN USART3_Init 2 */
+  /* USER CODE END USART3_Init 1 */
+  huart3.Instance = USART3;
+  huart3.Init.BaudRate = 115200;
+  huart3.Init.WordLength = UART_WORDLENGTH_8B;
+  huart3.Init.StopBits = UART_STOPBITS_1;
+  huart3.Init.Parity = UART_PARITY_NONE;
+  huart3.Init.Mode = UART_MODE_TX_RX;
+  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart3.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart3.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+  huart3.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_SetTxFifoThreshold(&huart3, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_SetRxFifoThreshold(&huart3, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_DisableFifoMode(&huart3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART3_Init 2 */
 
-	/* USER CODE END USART3_Init 2 */
+  /* USER CODE END USART3_Init 2 */
 
 }
 
 /**
- * @brief GPIO Initialization Function
- * @param None
- * @retval None
- */
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
 
-	/* GPIO Ports Clock Enable */
-	__HAL_RCC_GPIOD_CLK_ENABLE();
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : PB0 */
+  GPIO_InitStruct.Pin = GPIO_PIN_0;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 }
 
@@ -258,13 +269,12 @@ static void MX_GPIO_Init(void)
 /* USER CODE END Header_vCommanding */
 void vCommanding(void *argument)
 {
-	/* USER CODE BEGIN 5 */
+  /* USER CODE BEGIN 5 */
 	CommandingTaskSTATE CommandingTask_CurrentState = CommandingTaskIDLE ;
 	uint8_t UART_Counter = 0 , UART_RecievedData = 0  ;
 	HAL_StatusTypeDef UART_MessageRecieved = HAL_ERROR ;
 	char * Delay_Command = NULL ;
 	char RTOS_USART_ORDERS_ch [20] ;
-	BaseType_t Queue_Filled_b = pdFALSE ;
 	uint32_t  pDelayCommand_u32 = 0 ;
 	/* Infinite loop */
 	for(;;)
@@ -326,7 +336,7 @@ void vCommanding(void *argument)
 
 		}
 	}
-	/* USER CODE END 5 */
+  /* USER CODE END 5 */
 }
 
 /* USER CODE BEGIN Header_vExecuting */
@@ -338,50 +348,49 @@ void vCommanding(void *argument)
 /* USER CODE END Header_vExecuting */
 void vExecuting(void *argument)
 {
-	/* USER CODE BEGIN vExecuting */
-	uint32_t pCommand_Buffer_u32 = 0 ;
-	uint64_t RTOS_Ticks ;
+  /* USER CODE BEGIN vExecuting */
+	uint32_t pCommand_Buffer_u32 = 50 ;
 	/* Infinite loop */
 	for(;;)
 	{
 		if ( xQueueReceive(CommandQueueHandle, &pCommand_Buffer_u32, 10 ) )
 		{
-			HAL_UART_Transmit(&huart3,(uint8_t*) &pCommand_Buffer_u32 , 4 , 100 ) ;
+			HAL_UART_Transmit(&huart3," Command Updated \r\n" , 18 , 100 ) ;
 		}
 		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0) ;
 		vTaskDelay(pCommand_Buffer_u32) ;
 	}
-	/* USER CODE END vExecuting */
+  /* USER CODE END vExecuting */
 }
 
 /**
- * @brief  This function is executed in case of error occurrence.
- * @retval None
- */
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
 void Error_Handler(void)
 {
-	/* USER CODE BEGIN Error_Handler_Debug */
+  /* USER CODE BEGIN Error_Handler_Debug */
 	/* User can add his own implementation to report the HAL error return state */
 	__disable_irq();
 	while (1)
 	{
 	}
-	/* USER CODE END Error_Handler_Debug */
+  /* USER CODE END Error_Handler_Debug */
 }
 
 #ifdef  USE_FULL_ASSERT
 /**
- * @brief  Reports the name of the source file and the source line number
- *         where the assert_param error has occurred.
- * @param  file: pointer to the source file name
- * @param  line: assert_param error line source number
- * @retval None
- */
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
 void assert_failed(uint8_t *file, uint32_t line)
 {
-	/* USER CODE BEGIN 6 */
+  /* USER CODE BEGIN 6 */
 	/* User can add his own implementation to report the file name and line number,
      ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-	/* USER CODE END 6 */
+  /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
