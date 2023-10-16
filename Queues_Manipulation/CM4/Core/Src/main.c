@@ -24,6 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include "string.h"
 #include "queue.h"
+#include "stdlib.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -68,15 +69,12 @@ const osThreadAttr_t ExecutingTask_attributes = {
 		.priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for CommandQueue */
-osMessageQueueId_t CommandQueueHandle;
-const osMessageQueueAttr_t CommandQueue_attributes = {
-		.name = "CommandQueue"
-};
+QueueHandle_t CommandQueueHandle ;
+
+
 /* Definitions for FeedbackQueue */
-osMessageQueueId_t FeedbackQueueHandle;
-const osMessageQueueAttr_t FeedbackQueue_attributes = {
-		.name = "FeedbackQueue"
-};
+QueueHandle_t FeedbackQueueHandle;
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -146,13 +144,14 @@ int main(void)
 
 	/* Create the queue(s) */
 	/* creation of CommandQueue */
-	CommandQueueHandle = osMessageQueueNew (10, sizeof(uint32_t), &CommandQueue_attributes);
+
 
 	/* creation of FeedbackQueue */
-	FeedbackQueueHandle = osMessageQueueNew (10, sizeof(uint32_t), &FeedbackQueue_attributes);
+	//FeedbackQueueHandle = osMessageQueueNew (10, sizeof(uint32_t), &FeedbackQueue_attributes);
 
 	/* USER CODE BEGIN RTOS_QUEUES */
 	/* add queues, ... */
+	CommandQueueHandle = xQueueCreate(10,sizeof(uint32_t)) ;
 	/* USER CODE END RTOS_QUEUES */
 
 	/* Create the thread(s) */
@@ -265,6 +264,8 @@ void vCommanding(void *argument)
 	HAL_StatusTypeDef UART_MessageRecieved = HAL_ERROR ;
 	char * Delay_Command = NULL ;
 	char RTOS_USART_ORDERS_ch [20] ;
+	BaseType_t Queue_Filled_b = pdFALSE ;
+	uint32_t  pDelayCommand_u32 = 0 ;
 	/* Infinite loop */
 	for(;;)
 	{
@@ -312,8 +313,10 @@ void vCommanding(void *argument)
 					* (Delay_Command + Copy_counter) = RTOS_USART_ORDERS_ch [counter ++ ] ;
 					Copy_counter ++ ;
 				}
-				HAL_UART_Transmit(&huart3, Delay_Command, 5, 100) ;
-				xQueueSend(CommandQueueHandle , Delay_Command , 100  ) ;
+				* (Delay_Command + Copy_counter) = '\0' ;
+				HAL_UART_Transmit(&huart3, (uint8_t *) Delay_Command , strlen(Delay_Command) ,  100 ) ;
+				pDelayCommand_u32 = atoi(Delay_Command) ;
+				xQueueSend(CommandQueueHandle , &pDelayCommand_u32 , 10 ) ;
 			}
 			CommandingTask_CurrentState = CommandingTaskIDLE ;
 			memset ( RTOS_USART_ORDERS_ch , 0 ,UART_Counter * sizeof(char)) ;
@@ -337,16 +340,16 @@ void vExecuting(void *argument)
 {
 	/* USER CODE BEGIN vExecuting */
 	uint32_t pCommand_Buffer_u32 = 0 ;
-	BaseType_t NumberOfRecievedCommands_long = pdFALSE ;
+	uint64_t RTOS_Ticks ;
 	/* Infinite loop */
 	for(;;)
 	{
-		NumberOfRecievedCommands_long = xQueueReceive( CommandQueueHandle , &pCommand_Buffer_u32, portMAX_DELAY) ;
-		if ( NumberOfRecievedCommands_long )
+		if ( xQueueReceive(CommandQueueHandle, &pCommand_Buffer_u32, 10 ) )
 		{
-			HAL_UART_Transmit(&huart3 ,(uint8_t *)pCommand_Buffer_u32 , 5 , 100 ) ;
+			HAL_UART_Transmit(&huart3,(uint8_t*) &pCommand_Buffer_u32 , 4 , 100 ) ;
 		}
-		vTaskDelay(50) ;
+		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0) ;
+		vTaskDelay(pCommand_Buffer_u32) ;
 	}
 	/* USER CODE END vExecuting */
 }
