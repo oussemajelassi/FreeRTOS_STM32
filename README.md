@@ -89,3 +89,19 @@ I fixed this by simply using
 ``HAL_UART_TRANSMIT(xxxx , xxxx ,  **strlen ( Heap_AllocatedMemory )**, xxx ) ; ``
 
 
+### Queues : Data Transfer : 
+
+Queues are a First in First Out data structure and are used in freeRTOS in order to communicate between task.
+The basic Idea is that one task is going to put data inside while the other is going to read : 
+
+![image](https://github.com/oussemajelassi/FreeRTOS_STM32/assets/100140668/4189202c-9464-49c6-af3e-8da9119d6975)
+
+In case two tasks are reading at the same time The one that have more priority will be served first.
+
+In case One task tries to read from an empty queue it will go to a **suspended** state until that queue is filled.
+
+Final results are shown here : One task reads from UART, fills a queue and the other task unbox the queue and update its toggle rate.
+I think Queues still have many features for me to discover however for now that ll be it.
+
+https://github.com/oussemajelassi/FreeRTOS_STM32/assets/100140668/05745b59-1af5-4ab3-8c5a-8d255e6f57be
+
