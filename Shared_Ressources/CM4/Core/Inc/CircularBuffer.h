@@ -17,8 +17,8 @@ class  CircularBuffer
 {
 private :
 	uint32_t size ;
-	uint8_t head_index ;
-	uint8_t tail_index ;
+	uint32_t head_index ;
+	uint32_t tail_index ;
 	uint8_t * CircularBufferHandle ;
 	bool full ;
 
