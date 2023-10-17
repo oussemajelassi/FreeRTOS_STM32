@@ -9,13 +9,15 @@
 #include "CircularBuffer.h"
 #include "FreeRTOS.h"
 #include "portable.h"
+#include "stdlib.h"
 
 CircularBuffer::CircularBuffer (uint32_t size )
 {
-	uint8_t * tmp = static_cast <uint8_t *> ( pvPortMalloc(size * sizeof(uint8_t ) ) ) ;
+	uint8_t * tmp = static_cast <uint8_t *> ( malloc(size * sizeof(uint8_t ) ) ) ;
 	if ( tmp  )
 	{
 		this->CircularBufferHandle = tmp ;
+		this->size = size ;
 		this->reset() ;
 	}
 
@@ -59,7 +61,7 @@ uint8_t CircularBuffer::read_item (void)
 
 CircularBuffer::~CircularBuffer()
 {
-	vPortFree(CircularBufferHandle) ;
+	free(CircularBufferHandle) ;
 }
 
 void CircularBuffer::reset ( void )

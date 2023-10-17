@@ -10,6 +10,9 @@
 
 #include "memory.h"
 #include "stdint.h"
+/*
+ * This Class is meant to instantiate its objects globally.
+ */
 class  CircularBuffer
 {
 private :
@@ -18,6 +21,7 @@ private :
 	uint8_t tail_index ;
 	uint8_t * CircularBufferHandle ;
 	bool full ;
+
 public :
 	CircularBuffer ( uint32_t size )   ;
 	uint8_t read_item( void ) ;
@@ -26,7 +30,6 @@ public :
 	void reset ( void ) ;
 	uint8_t * GetBuff ( void ) ;
 	~CircularBuffer (void) ;
-
 
 
 };
