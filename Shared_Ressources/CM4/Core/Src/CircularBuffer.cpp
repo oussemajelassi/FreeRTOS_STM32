@@ -33,15 +33,20 @@ void CircularBuffer::insert_item(uint8_t item )
 	{
 		* ( this->CircularBufferHandle + this->head_index ) = item ;
 		this->head_index ++ ;
-		if ( this->head_index == this->size ) this->full = true ;
+		if ( this->head_index == this->size ) { this->full = true ; }
+		else { this->full =false ; }
 	}
 	else
 	{
+		this->tail_index ++ ;
+		this->tail_index = this->tail_index % this->size ;
 		this->head_index = 0 ;
 		this->insert_item(item) ;
 	}
 }
-
+/*
+ * TODO : this is not correct sometimes head will get bacj to 0 !!!!
+ */
 uint32_t CircularBuffer::GetFreeSpace()
 {
 	return ( this->size - this->head_index ) ;
