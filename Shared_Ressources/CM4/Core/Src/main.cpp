@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "CircularBuffer.h"
+#include "SharedRessources.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -84,8 +85,7 @@ const osThreadAttr_t ProducerTask_5_attributes = {
 };
 /* USER CODE BEGIN PV */
 
-CircularBuffer SharedBuffer ( 15 ) ;
-
+CircularBuffer SharedBuffer ( 3 ) ;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -113,11 +113,8 @@ void vProducer_5(void *argument);
 int main(void)
 {
 	/* USER CODE BEGIN 1 */
-	SharedBuffer.insert_item(5) ;
-	SharedBuffer.insert_item(8) ;
-	SharedBuffer.insert_item(10) ;
-	volatile uint8_t tmp = SharedBuffer.read_item() ;
-	tmp ++ ;
+
+
 	/* USER CODE END 1 */
 
 	/* USER CODE BEGIN Boot_Mode_Sequence_1 */
@@ -140,7 +137,11 @@ int main(void)
 	MX_GPIO_Init();
 	MX_USART3_UART_Init();
 	/* USER CODE BEGIN 2 */
+	Producer Flooki ( GPIOB , GPIO_PIN_0 ) ;
+	Flooki.InsertItem(SharedBuffer) ;
+	volatile uint8_t tmp = SharedBuffer.read_item() ;
 
+	tmp ++ ;
 	/* USER CODE END 2 */
 
 	/* Init scheduler */
@@ -256,9 +257,20 @@ static void MX_USART3_UART_Init(void)
  */
 static void MX_GPIO_Init(void)
 {
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
 
 	/* GPIO Ports Clock Enable */
 	__HAL_RCC_GPIOB_CLK_ENABLE();
+
+	/*Configure GPIO pin Output Level */
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
+
+	/*Configure GPIO pin : PB0 */
+	GPIO_InitStruct.Pin = GPIO_PIN_0;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 }
 
