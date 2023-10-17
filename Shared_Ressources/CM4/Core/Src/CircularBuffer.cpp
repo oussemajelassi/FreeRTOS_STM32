@@ -60,7 +60,7 @@ uint8_t CircularBuffer::read_item (void)
 {
 	uint8_t tmp = * ( this->CircularBufferHandle + this->tail_index ) ;
 	this->tail_index ++ ;
-	this->tail_index = this->head_index % this->size ;
+	this->tail_index = this->tail_index % this->size ;
 	return ( tmp ) ;
 }
 
