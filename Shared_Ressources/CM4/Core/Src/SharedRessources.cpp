@@ -15,10 +15,11 @@ uint8_t Consumer::sConsumerID_u8 = 0 ;
 
 /*** Methods Producer **/
 
-Producer::Producer(GPIO_TypeDef *GPIOx , uint16_t GPIO_Pin)
+Producer::Producer(GPIO_TypeDef *GPIOx , uint16_t GPIO_Pin , uint8_t ProducedQuantity_u8)
 {
 	this->GPIO_Pin = GPIO_Pin ;
 	this->GPIOx = GPIOx ;
+	this-> ProducedQuantity_u8 = ProducedQuantity_u8  ;
 	this->ProductId_u8 = this->sProducedId_u8 ;
 	this->sProducedId_u8 ++ ;
 	HAL_GPIO_WritePin(GPIOx , this->GPIO_Pin , GPIO_PIN_SET ) ;
