@@ -128,3 +128,6 @@ Mutexes are the most known and used in this context they are seen as a token or 
 
 This Challenge will be nothing but a circular buffer that gets filled with numbers from "Producer Task" and get read from a "Consumer Task".
 I will try to shape this so I can Practice C++ Programming a little bit and combine twwo powers into one.
+
+The application combines using a shared mutex in order to get access to the buffer, every producer can insert until free spots are done or until it inserts or its production.
+Every Consumer can withdraw from the buffer until there is no filled spots or if its needed quantity is satisfied.
