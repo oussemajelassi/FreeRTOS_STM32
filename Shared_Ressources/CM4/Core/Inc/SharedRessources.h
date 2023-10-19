@@ -17,21 +17,24 @@ private :
 	GPIO_TypeDef * GPIOx ;
 	uint8_t ProductId_u8 ;
 public :
+	uint8_t ProducedQuantity_u8 ;
 	static uint8_t sProducedId_u8  ;
-	Producer(GPIO_TypeDef *GPIOx , uint16_t GPIO_Pin)  ;
+	Producer(GPIO_TypeDef *GPIOx , uint16_t GPIO_Pin , uint8_t ProducedQuantity_u8 )  ;
 	~Producer(void) ;
-	void InsertItem ( CircularBuffer buff ) ;
+	void InsertItem ( CircularBuffer* buff ) ;
 
 };
 
 class Consumer
 {
 private :
-	uint8_t NeededQuantity_8 ;
+	uint8_t NeededQuantity_u8 ;
+	uint8_t ConsumerID_u8 ;
 public :
+	static uint8_t sConsumerID_u8  ;
 	Consumer(void) ;
 	~Consumer(void);
-	uint8_t RetrieveItem ( CircularBuffer buff ) ;
+	uint8_t RetrieveItem ( CircularBuffer* buff ) ;
 };
 
 
