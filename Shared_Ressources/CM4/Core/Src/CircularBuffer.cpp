@@ -19,6 +19,10 @@ CircularBuffer::CircularBuffer (uint32_t size )
 		this->CircularBufferHandle = tmp ;
 		this->size = size ;
 		this->reset() ;
+		this->head_index = 0 ;
+		this->tail_index = 0 ;
+		this->full = false ;
+		this->GetFreeSpace = this->size ;
 	}
 
 	else
@@ -29,28 +33,24 @@ CircularBuffer::CircularBuffer (uint32_t size )
 
 void CircularBuffer::insert_item(uint8_t item )
 {
-	if ( this->GetFreeSpace() )
+	if ( this->GetFreeSpace )
 	{
 		* ( this->CircularBufferHandle + this->head_index ) = item ;
 		this->head_index ++ ;
-		if ( this->head_index == this->size ) { this->full = true ; }
-		else { this->full =false ; }
+		this->head_index =this->head_index % this->size ;
+		this->GetFreeSpace -- ;
 	}
 	else
 	{
+		* ( this->CircularBufferHandle + this->head_index ) = item ;
 		this->tail_index ++ ;
 		this->tail_index = this->tail_index % this->size ;
-		this->head_index = 0 ;
-		this->insert_item(item) ;
+		this->head_index ++ ;
+		this->head_index =this->head_index % this->size ;
+
 	}
 }
-/*
- * TODO : this is not correct sometimes head will get bacj to 0 !!!!
- */
-uint32_t CircularBuffer::GetFreeSpace()
-{
-	return ( this->size - this->head_index ) ;
-}
+
 
 /*
  * Brief : This Function suppose that user have already checked that there is unseen messages
