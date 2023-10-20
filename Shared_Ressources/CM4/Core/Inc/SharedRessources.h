@@ -33,7 +33,7 @@ private :
 public :
 	uint8_t NeededQuantity_u8 ;
 	static uint8_t sConsumerID_u8  ;
-	Consumer(void) ;
+	Consumer(uint8_t NeededQuantity_u8) ;
 	~Consumer(void);
 	uint8_t RetrieveItem ( CircularBuffer* buff ) ;
 };
