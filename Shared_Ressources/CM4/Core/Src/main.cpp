@@ -84,6 +84,20 @@ const osThreadAttr_t ProducerTask_5_attributes = {
 		.stack_size = 128 * 4,
 		.priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for Consumer_1 */
+osThreadId_t Consumer_1Handle;
+const osThreadAttr_t Consumer_1_attributes = {
+		.name = "Consumer_1",
+		.stack_size = 128 * 4,
+		.priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for Consumer_2 */
+osThreadId_t Consumer_2Handle;
+const osThreadAttr_t Consumer_2_attributes = {
+		.name = "Consumer_2",
+		.stack_size = 128 * 4,
+		.priority = (osPriority_t) osPriorityNormal,
+};
 /* USER CODE BEGIN PV */
 
 CircularBuffer SharedBuffer ( 15 ) ;
@@ -100,6 +114,8 @@ void vProducer_2(void *argument);
 void vProducer_3(void *argument);
 void vProducer_4(void *argument);
 void vProducer_5(void *argument);
+void vConsumer_1(void *argument);
+void vConsumer_2(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -150,8 +166,8 @@ int main(void)
 	/* USER CODE BEGIN RTOS_MUTEX */
 	/* add mutexes, ... */
 	SharedBufferMutex  = xSemaphoreCreateMutex() ;
-	SharedBufferEmptySlots = xSemaphoreCreateCounting ( SharedBuffer.size , SharedBuffer.size  )  ;
-	SharedBufferFilledSlots   = xSemaphoreCreateCounting ( SharedBuffer.size , SharedBuffer.size ) ;
+	SharedBufferEmptySlots = xSemaphoreCreateCounting ( SharedBuffer.size   , SharedBuffer.size   )  ;
+	SharedBufferFilledSlots   = xSemaphoreCreateCounting ( SharedBuffer.size   , 0 ) ;
 	/* USER CODE END RTOS_MUTEX */
 
 	/* USER CODE BEGIN RTOS_SEMAPHORES */
@@ -181,6 +197,12 @@ int main(void)
 
 	/* creation of ProducerTask_5 */
 	ProducerTask_5Handle = osThreadNew(vProducer_5, NULL, &ProducerTask_5_attributes);
+
+	/* creation of Consumer_1 */
+	Consumer_1Handle = osThreadNew(vConsumer_1, NULL, &Consumer_1_attributes);
+
+	/* creation of Consumer_2 */
+	Consumer_2Handle = osThreadNew(vConsumer_2, NULL, &Consumer_2_attributes);
 
 	/* USER CODE BEGIN RTOS_THREADS */
 	/* add threads, ... */
@@ -332,18 +354,26 @@ void vProducer_1(void *argument)
 {
 	/* USER CODE BEGIN 5 */
 	Producer Producer_1 ( GPIOB , GPIO_PIN_0 , 2 ) ;
-	BaseType_t tmp ;
 	/* Infinite loop */
 	for(;;)
 	{
-		xSemaphoreTake(SharedBufferMutex , 0 ) ;
-		while ( ( xSemaphoreTake(SharedBufferEmptySlots , 10 ) ==pdTRUE )  && ( Producer_1.ProducedQuantity_u8 ) )
+		while  ( Producer_1.ProducedQuantity_u8 )
 		{
-			Producer_1.ProducedQuantity_u8 -- ;
-			Producer_1.InsertItem(&SharedBuffer) ;
+			if ( xSemaphoreTake(SharedBufferEmptySlots , portMAX_DELAY ) ==pdTRUE )
+			{
+				xSemaphoreTake(SharedBufferMutex , 0 ) ;
+				Producer_1.ProducedQuantity_u8 -- ;
+				Producer_1.InsertItem(&SharedBuffer) ;
+				xSemaphoreGive(SharedBufferMutex) ;
+				xSemaphoreGive(SharedBufferFilledSlots) ;
 
+			}
+			else
+			{
+				break  ;
+			}
 		}
-		xSemaphoreGive(SharedBufferMutex) ;
+
 		vTaskDelay(5) ;
 	}
 	/* USER CODE END 5 */
@@ -363,9 +393,14 @@ void vProducer_2(void *argument)
 	/* Infinite loop */
 	for(;;)
 	{
-		xSemaphoreTake(SharedBufferMutex , 0 ) ;
-		Producer_2.InsertItem(&SharedBuffer) ;
-		xSemaphoreGive(SharedBufferMutex) ;
+		while ( ( xSemaphoreTake(SharedBufferEmptySlots , portMAX_DELAY ) ==pdTRUE )  && ( Producer_2.ProducedQuantity_u8 ) )
+		{
+			xSemaphoreTake(SharedBufferMutex , 0 ) ;
+			Producer_2.ProducedQuantity_u8 -- ;
+			Producer_2.InsertItem(&SharedBuffer) ;
+			xSemaphoreGive(SharedBufferMutex) ;
+			xSemaphoreGive(SharedBufferFilledSlots) ;
+		}
 		vTaskDelay(5) ;
 	}
 	/* USER CODE END vProducer_2 */
@@ -385,9 +420,15 @@ void vProducer_3(void *argument)
 	/* Infinite loop */
 	for(;;)
 	{
-		xSemaphoreTake(SharedBufferMutex , 0 ) ;
-		Producer_3.InsertItem(&SharedBuffer) ;
-		xSemaphoreGive(SharedBufferMutex) ;
+		while ( ( xSemaphoreTake(SharedBufferEmptySlots , portMAX_DELAY ) ==pdTRUE )  && ( Producer_3.ProducedQuantity_u8 ) )
+		{
+			xSemaphoreTake(SharedBufferMutex , 0 ) ;
+			Producer_3.ProducedQuantity_u8 -- ;
+			Producer_3.InsertItem(&SharedBuffer) ;
+			xSemaphoreGive(SharedBufferMutex) ;
+			xSemaphoreGive(SharedBufferFilledSlots) ;
+
+		}
 		vTaskDelay(5) ;
 	}
 	/* USER CODE END vProducer_3 */
@@ -407,9 +448,15 @@ void vProducer_4(void *argument)
 	/* Infinite loop */
 	for(;;)
 	{
-		xSemaphoreTake(SharedBufferMutex , 0 ) ;
-		Producer_4.InsertItem(&SharedBuffer) ;
-		xSemaphoreGive(SharedBufferMutex) ;
+
+		while ( ( xSemaphoreTake(SharedBufferEmptySlots , portMAX_DELAY ) ==pdTRUE )  && ( Producer_4.ProducedQuantity_u8 ) )
+		{
+			xSemaphoreTake(SharedBufferMutex , 0 ) ;
+			Producer_4.ProducedQuantity_u8 -- ;
+			Producer_4.InsertItem(&SharedBuffer) ;
+			xSemaphoreGive(SharedBufferMutex) ;
+			xSemaphoreGive(SharedBufferFilledSlots) ;
+		}
 		vTaskDelay(5) ;
 	}
 	/* USER CODE END vProducer_4 */
@@ -429,12 +476,76 @@ void vProducer_5(void *argument)
 	/* Infinite loop */
 	for(;;)
 	{
-		xSemaphoreTake(SharedBufferMutex , 0 ) ;
-		Producer_5.InsertItem(&SharedBuffer) ;
-		xSemaphoreGive(SharedBufferMutex) ;
+		while ( ( xSemaphoreTake(SharedBufferEmptySlots , portMAX_DELAY ) ==pdTRUE )  && ( Producer_5.ProducedQuantity_u8 ) )
+		{
+			xSemaphoreTake(SharedBufferMutex , 0 ) ;
+			Producer_5.ProducedQuantity_u8 -- ;
+			Producer_5.InsertItem(&SharedBuffer) ;
+			xSemaphoreGive(SharedBufferMutex) ;
+			xSemaphoreGive(SharedBufferFilledSlots) ;
+		}
 		vTaskDelay(5) ;
 	}
 	/* USER CODE END vProducer_5 */
+}
+
+/* USER CODE BEGIN Header_vConsumer_1 */
+/**
+ * @brief Function implementing the Consumer_1 thread.
+ * @param argument: Not used
+ * @retval None
+ */
+/* USER CODE END Header_vConsumer_1 */
+void vConsumer_1(void *argument)
+{
+	/* USER CODE BEGIN vConsumer_1 */
+	Consumer Consumer_1  ;
+	/* Infinite loop */
+	for(;;)
+	{
+		while ( ( xSemaphoreTake(SharedBufferFilledSlots , portMAX_DELAY ) ==pdTRUE )  && ( Consumer_1.NeededQuantity_u8 ) )
+		{
+			xSemaphoreTake(SharedBufferMutex , 0 ) ;
+			Consumer_1.NeededQuantity_u8  -- ;
+			Consumer_1.RetrieveItem(&SharedBuffer) ;
+			xSemaphoreGive(SharedBufferMutex) ;
+			xSemaphoreGive(SharedBufferEmptySlots) ;
+		}
+
+		vTaskDelay(5) ;
+
+	}
+	/* USER CODE END vConsumer_1 */
+}
+
+/* USER CODE BEGIN Header_vConsumer_2 */
+/**
+ * @brief Function implementing the Consumer_2 thread.
+ * @param argument: Not used
+ * @retval None
+ */
+/* USER CODE END Header_vConsumer_2 */
+void vConsumer_2(void *argument)
+{
+	/* USER CODE BEGIN vConsumer_2 */
+	Consumer Consumer_2  ;
+	/* Infinite loop */
+	for(;;)
+	{
+
+		while ( ( xSemaphoreTake(SharedBufferFilledSlots , 10 ) ==pdTRUE )  && ( Consumer_2.NeededQuantity_u8 ) )
+		{
+			xSemaphoreTake(SharedBufferMutex , 0 ) ;
+			Consumer_2.NeededQuantity_u8  -- ;
+			Consumer_2.RetrieveItem(&SharedBuffer) ;
+			xSemaphoreGive(SharedBufferMutex) ;
+			xSemaphoreGive(SharedBufferEmptySlots) ;
+		}
+
+		vTaskDelay(5) ;
+
+	}
+	/* USER CODE END vConsumer_2 */
 }
 
 /**
