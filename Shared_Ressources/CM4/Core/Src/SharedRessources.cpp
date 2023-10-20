@@ -52,5 +52,6 @@ Consumer::~Consumer()
 uint8_t Consumer::RetrieveItem(CircularBuffer* buff)
 {
 	return  ( buff->read_item() ) ;
+
 }
 

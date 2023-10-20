@@ -28,9 +28,10 @@ public :
 class Consumer
 {
 private :
-	uint8_t NeededQuantity_u8 ;
+
 	uint8_t ConsumerID_u8 ;
 public :
+	uint8_t NeededQuantity_u8 ;
 	static uint8_t sConsumerID_u8  ;
 	Consumer(void) ;
 	~Consumer(void);
