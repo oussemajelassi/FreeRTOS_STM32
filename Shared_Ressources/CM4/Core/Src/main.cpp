@@ -393,14 +393,22 @@ void vProducer_2(void *argument)
 	/* Infinite loop */
 	for(;;)
 	{
-		while ( ( xSemaphoreTake(SharedBufferEmptySlots , portMAX_DELAY ) ==pdTRUE )  && ( Producer_2.ProducedQuantity_u8 ) )
+		while  ( Producer_2.ProducedQuantity_u8 )
 		{
-			xSemaphoreTake(SharedBufferMutex , 0 ) ;
-			Producer_2.ProducedQuantity_u8 -- ;
-			Producer_2.InsertItem(&SharedBuffer) ;
-			xSemaphoreGive(SharedBufferMutex) ;
-			xSemaphoreGive(SharedBufferFilledSlots) ;
+			if ( xSemaphoreTake(SharedBufferEmptySlots , portMAX_DELAY ) ==pdTRUE )
+			{
+				xSemaphoreTake(SharedBufferMutex , 0 ) ;
+				Producer_2.ProducedQuantity_u8 -- ;
+				Producer_2.InsertItem(&SharedBuffer) ;
+				xSemaphoreGive(SharedBufferMutex) ;
+				xSemaphoreGive(SharedBufferFilledSlots) ;
+			}
+			else
+			{
+				break  ;
+			}
 		}
+
 		vTaskDelay(5) ;
 	}
 	/* USER CODE END vProducer_2 */
@@ -420,15 +428,23 @@ void vProducer_3(void *argument)
 	/* Infinite loop */
 	for(;;)
 	{
-		while ( ( xSemaphoreTake(SharedBufferEmptySlots , portMAX_DELAY ) ==pdTRUE )  && ( Producer_3.ProducedQuantity_u8 ) )
+		while  ( Producer_3.ProducedQuantity_u8 )
 		{
-			xSemaphoreTake(SharedBufferMutex , 0 ) ;
-			Producer_3.ProducedQuantity_u8 -- ;
-			Producer_3.InsertItem(&SharedBuffer) ;
-			xSemaphoreGive(SharedBufferMutex) ;
-			xSemaphoreGive(SharedBufferFilledSlots) ;
+			if ( xSemaphoreTake(SharedBufferEmptySlots , portMAX_DELAY ) ==pdTRUE )
+			{
+				xSemaphoreTake(SharedBufferMutex , 0 ) ;
+				Producer_3.ProducedQuantity_u8 -- ;
+				Producer_3.InsertItem(&SharedBuffer) ;
+				xSemaphoreGive(SharedBufferMutex) ;
+				xSemaphoreGive(SharedBufferFilledSlots) ;
 
+			}
+			else
+			{
+				break  ;
+			}
 		}
+
 		vTaskDelay(5) ;
 	}
 	/* USER CODE END vProducer_3 */
@@ -448,15 +464,23 @@ void vProducer_4(void *argument)
 	/* Infinite loop */
 	for(;;)
 	{
-
-		while ( ( xSemaphoreTake(SharedBufferEmptySlots , portMAX_DELAY ) ==pdTRUE )  && ( Producer_4.ProducedQuantity_u8 ) )
+		while  ( Producer_4.ProducedQuantity_u8 )
 		{
-			xSemaphoreTake(SharedBufferMutex , 0 ) ;
-			Producer_4.ProducedQuantity_u8 -- ;
-			Producer_4.InsertItem(&SharedBuffer) ;
-			xSemaphoreGive(SharedBufferMutex) ;
-			xSemaphoreGive(SharedBufferFilledSlots) ;
+			if ( xSemaphoreTake(SharedBufferEmptySlots , portMAX_DELAY ) ==pdTRUE )
+			{
+				xSemaphoreTake(SharedBufferMutex , 0 ) ;
+				Producer_4.ProducedQuantity_u8 -- ;
+				Producer_4.InsertItem(&SharedBuffer) ;
+				xSemaphoreGive(SharedBufferMutex) ;
+				xSemaphoreGive(SharedBufferFilledSlots) ;
+
+			}
+			else
+			{
+				break  ;
+			}
 		}
+
 		vTaskDelay(5) ;
 	}
 	/* USER CODE END vProducer_4 */
@@ -476,13 +500,20 @@ void vProducer_5(void *argument)
 	/* Infinite loop */
 	for(;;)
 	{
-		while ( ( xSemaphoreTake(SharedBufferEmptySlots , portMAX_DELAY ) ==pdTRUE )  && ( Producer_5.ProducedQuantity_u8 ) )
+		while  ( Producer_5.ProducedQuantity_u8 )
 		{
-			xSemaphoreTake(SharedBufferMutex , 0 ) ;
-			Producer_5.ProducedQuantity_u8 -- ;
-			Producer_5.InsertItem(&SharedBuffer) ;
-			xSemaphoreGive(SharedBufferMutex) ;
-			xSemaphoreGive(SharedBufferFilledSlots) ;
+			if ( xSemaphoreTake(SharedBufferEmptySlots , portMAX_DELAY ) ==pdTRUE )
+			{
+				xSemaphoreTake(SharedBufferMutex , 0 ) ;
+				Producer_5.ProducedQuantity_u8 -- ;
+				Producer_5.InsertItem(&SharedBuffer) ;
+				xSemaphoreGive(SharedBufferMutex) ;
+				xSemaphoreGive(SharedBufferFilledSlots) ;
+			}
+			else
+			{
+				break  ;
+			}
 		}
 		vTaskDelay(5) ;
 	}
@@ -499,21 +530,26 @@ void vProducer_5(void *argument)
 void vConsumer_1(void *argument)
 {
 	/* USER CODE BEGIN vConsumer_1 */
-	Consumer Consumer_1  ;
+	Consumer Consumer_1 ( 4 )  ;
 	/* Infinite loop */
 	for(;;)
 	{
-		while ( ( xSemaphoreTake(SharedBufferFilledSlots , portMAX_DELAY ) ==pdTRUE )  && ( Consumer_1.NeededQuantity_u8 ) )
+		while ( Consumer_1.NeededQuantity_u8 )
 		{
-			xSemaphoreTake(SharedBufferMutex , 0 ) ;
-			Consumer_1.NeededQuantity_u8  -- ;
-			Consumer_1.RetrieveItem(&SharedBuffer) ;
-			xSemaphoreGive(SharedBufferMutex) ;
-			xSemaphoreGive(SharedBufferEmptySlots) ;
+			if  ( xSemaphoreTake(SharedBufferFilledSlots , portMAX_DELAY ) ==pdTRUE )
+			{
+				xSemaphoreTake(SharedBufferMutex , 0 ) ;
+				Consumer_1.NeededQuantity_u8  -- ;
+				Consumer_1.RetrieveItem(&SharedBuffer) ;
+				xSemaphoreGive(SharedBufferMutex) ;
+				xSemaphoreGive(SharedBufferEmptySlots) ;
+			}
+			else
+			{
+				break ;
+			}
 		}
-
 		vTaskDelay(5) ;
-
 	}
 	/* USER CODE END vConsumer_1 */
 }
@@ -528,22 +564,26 @@ void vConsumer_1(void *argument)
 void vConsumer_2(void *argument)
 {
 	/* USER CODE BEGIN vConsumer_2 */
-	Consumer Consumer_2  ;
+	Consumer Consumer_2 ( 3 )  ;
 	/* Infinite loop */
 	for(;;)
 	{
-
-		while ( ( xSemaphoreTake(SharedBufferFilledSlots , 10 ) ==pdTRUE )  && ( Consumer_2.NeededQuantity_u8 ) )
+		while ( Consumer_2.NeededQuantity_u8 )
 		{
-			xSemaphoreTake(SharedBufferMutex , 0 ) ;
-			Consumer_2.NeededQuantity_u8  -- ;
-			Consumer_2.RetrieveItem(&SharedBuffer) ;
-			xSemaphoreGive(SharedBufferMutex) ;
-			xSemaphoreGive(SharedBufferEmptySlots) ;
+			if  ( xSemaphoreTake(SharedBufferFilledSlots , portMAX_DELAY ) ==pdTRUE )
+			{
+				xSemaphoreTake(SharedBufferMutex , 0 ) ;
+				Consumer_2.NeededQuantity_u8  -- ;
+				Consumer_2.RetrieveItem(&SharedBuffer) ;
+				xSemaphoreGive(SharedBufferMutex) ;
+				xSemaphoreGive(SharedBufferEmptySlots) ;
+			}
+			else
+			{
+				break ;
+			}
 		}
-
 		vTaskDelay(5) ;
-
 	}
 	/* USER CODE END vConsumer_2 */
 }
