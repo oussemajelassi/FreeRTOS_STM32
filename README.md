@@ -131,3 +131,8 @@ I will try to shape this so I can Practice C++ Programming a little bit and comb
 
 The application combines using a shared mutex in order to get access to the buffer, every producer can insert until free spots are done or until it inserts or its production.
 Every Consumer can withdraw from the buffer until there is no filled spots or if its needed quantity is satisfied.
+
+#### Data Manipulation : Double buffering : 
+
+Having Many tasks running concurrently is often linked to some data being inserted and treated on the same time. Last Time I implemented a Circular buffer which can handle the situation, however this this I will implement something else, **Double Buffer**, Which is a data structure that have one buffer being filled and one other being treated. When our computation are finished we will swap the two buffers.
+Meantime we should take care of the synchronization.
