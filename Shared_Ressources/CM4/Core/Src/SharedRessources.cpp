@@ -38,10 +38,11 @@ void Producer::InsertItem( CircularBuffer * buff )
 
 /*** Methods Consumer **/
 
-Consumer::Consumer(void)
+Consumer::Consumer(uint8_t NeededQuantity_u8)
 {
-	this->ConsumerID_u8 =  this->sConsumerID_u8 ;
+	this->ConsumerID_u8 =  this->sConsumerID_u8  ;
 	this->sConsumerID_u8 ++ ;
+	this->NeededQuantity_u8 = NeededQuantity_u8  ;
 }
 
 Consumer::~Consumer()
