@@ -18,14 +18,16 @@ class DoubleBuffer
 {
 private :
 	uint8_t FreeSpace ;
+	uint8_t Size ;
+	bool CurrentBufferReady = false ;
 	std::vector <int> CurrentBuffer ;
-	std::vector <int> NextBuffer ;
+	std::vector <int> NextBuffer  ;
 public :
 	DoubleBuffer ( uint8_t Size ) ;
 	~DoubleBuffer ( void ) ;
 	void Swap() ;
 	void NotifyComputaionTask ( void ) ;
-	int ComputeAvg ( void )  ;
+	double ComputeAvg ( void )  ;
 	void InsertData ( int Data ) ;
 };
 
