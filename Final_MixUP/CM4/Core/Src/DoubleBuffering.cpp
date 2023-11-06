@@ -12,16 +12,17 @@ extern TaskHandle_t ComputaionTaskHandle ;
 
 DoubleBuffer::DoubleBuffer ( uint8_t Size )
 {
-	this->CurrentBuffer.resize(Size) ;
-	this->NextBuffer.resize(Size) ;
+	this->NextBuffer.resize(0) ;
+	this->CurrentBuffer.resize(0);
 	this->FreeSpace = Size ;
 	this->Size = Size ;
 }
 
 void DoubleBuffer::Swap ( void )
 {
-	this->CurrentBuffer.swap(NextBuffer) ;
-	this->CurrentBuffer.clear() ;
+	this->CurrentBuffer.swap(this->NextBuffer) ;
+	this->NextBuffer.clear() ;
+	this->CurrentBuffer.resize(this->Size) ;
 	this->FreeSpace = this->Size ;
 }
 
@@ -30,14 +31,20 @@ void DoubleBuffer::NotifyComputaionTask ( void )
 	xTaskNotify(ComputaionTaskHandle ,  1  , eSetValueWithOverwrite ) ;
 }
 
-int DoubleBuffer::ComputeAvg( void )
+double DoubleBuffer::ComputeAvg( void )
 {
-	int Avg = 0 ;
-	for ( uint8_t cnt = 0 ; cnt <  (this->CurrentBuffer.size()) ; cnt ++  )
+	double Avg = 0 ;
+	double tmp = 0.0;
+	if ( this->CurrentBufferReady )
 	{
-		Avg += ( ( this->CurrentBuffer[cnt] ) / this->CurrentBuffer.size() ) ;
+		for ( uint8_t cnt = 0 ; cnt < this->Size ; cnt ++  )
+		{
+			tmp = this->CurrentBuffer[cnt] ;
+			Avg += ( ( (double) this->CurrentBuffer[cnt] ) / (double) this->Size ) ;
+		}
+		this->CurrentBufferReady = false ;
+		return ( Avg ) ;
 	}
-	return ( Avg ) ;
 }
 
 void DoubleBuffer::InsertData( int Data )
@@ -46,14 +53,10 @@ void DoubleBuffer::InsertData( int Data )
 	{
 		this->NextBuffer.push_back(Data) ;
 		this->FreeSpace -- ;
-
-	}
-	else
-	{
-		this->CurrentBuffer.swap(NextBuffer) ;
-		this->NextBuffer.clear() ;
-		this->FreeSpace = this->Size ;
-		this->InsertData(Data) ;
-
+		if ( this->FreeSpace == 0 )
+		{
+			this->Swap() ;
+			this->CurrentBufferReady = true ;
+		}
 	}
 }
