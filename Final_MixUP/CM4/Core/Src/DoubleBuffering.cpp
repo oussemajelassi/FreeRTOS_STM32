@@ -15,13 +15,14 @@ DoubleBuffer::DoubleBuffer ( uint8_t Size )
 	this->CurrentBuffer.resize(Size) ;
 	this->NextBuffer.resize(Size) ;
 	this->FreeSpace = Size ;
+	this->Size = Size ;
 }
 
 void DoubleBuffer::Swap ( void )
 {
 	this->CurrentBuffer.swap(NextBuffer) ;
 	this->CurrentBuffer.clear() ;
-	this->FreeSpace = this->CurrentBuffer.size() ;
+	this->FreeSpace = this->Size ;
 }
 
 void DoubleBuffer::NotifyComputaionTask ( void )
@@ -45,10 +46,14 @@ void DoubleBuffer::InsertData( int Data )
 	{
 		this->NextBuffer.push_back(Data) ;
 		this->FreeSpace -- ;
+
 	}
 	else
 	{
 		this->CurrentBuffer.swap(NextBuffer) ;
+		this->NextBuffer.clear() ;
+		this->FreeSpace = this->Size ;
 		this->InsertData(Data) ;
+
 	}
 }
