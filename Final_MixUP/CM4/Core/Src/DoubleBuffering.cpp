@@ -18,6 +18,12 @@ DoubleBuffer::DoubleBuffer ( uint8_t Size )
 	this->Size = Size ;
 }
 
+DoubleBuffer::~DoubleBuffer ( void )
+{
+	this->NextBuffer.clear() ;
+	this->CurrentBuffer.clear() ;
+}
+
 void DoubleBuffer::Swap ( void )
 {
 	this->CurrentBuffer.swap(this->NextBuffer) ;
@@ -28,24 +34,27 @@ void DoubleBuffer::Swap ( void )
 
 void DoubleBuffer::NotifyComputaionTask ( void )
 {
-	xTaskNotify(ComputaionTaskHandle ,  1  , eSetValueWithOverwrite ) ;
+	BaseType_t pxHigherPriorityTaskWoken ;
+	xTaskNotifyFromISR(ComputaionTaskHandle , 1  , eSetValueWithOverwrite , & pxHigherPriorityTaskWoken ) ;
 }
 
 double DoubleBuffer::ComputeAvg( void )
 {
 	double Avg = 0 ;
-	double tmp = 0.0;
-	if ( this->CurrentBufferReady )
+
+	for ( uint8_t cnt = 0 ; cnt < this->Size ; cnt ++  )
 	{
-		for ( uint8_t cnt = 0 ; cnt < this->Size ; cnt ++  )
-		{
-			tmp = this->CurrentBuffer[cnt] ;
-			Avg += ( ( (double) this->CurrentBuffer[cnt] ) / (double) this->Size ) ;
-		}
-		this->CurrentBufferReady = false ;
-		return ( Avg ) ;
+		Avg += ( ( (double) this->CurrentBuffer[cnt] ) / (double) this->Size ) ;
 	}
+	this->CurrentBufferReady = false ;
+
+
+	return ( Avg ) ;
 }
+
+/*
+ * Brief : Insert data mechanism is also where we swap the two buffers in advance
+ */
 
 void DoubleBuffer::InsertData( int Data )
 {
@@ -59,4 +68,17 @@ void DoubleBuffer::InsertData( int Data )
 			this->CurrentBufferReady = true ;
 		}
 	}
+}
+
+bool DoubleBuffer::GetCurrentBufferState( void )
+{
+	bool tmp = false ;
+	if ( this->CurrentBufferReady ) { tmp = true ; }
+	else { tmp = false ; }
+	return ( tmp ) ;
+}
+
+void DoubleBuffer::SetCurrentBufferState ( bool State )
+{
+	this->CurrentBufferReady = State ;
 }
