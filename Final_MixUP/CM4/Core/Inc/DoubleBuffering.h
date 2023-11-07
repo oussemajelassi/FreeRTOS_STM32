@@ -29,6 +29,8 @@ public :
 	void NotifyComputaionTask ( void ) ;
 	double ComputeAvg ( void )  ;
 	void InsertData ( int Data ) ;
+	bool GetCurrentBufferState ( void ) ;
+	void SetCurrentBufferState ( bool State ) ;
 };
 
 
